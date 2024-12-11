@@ -4,7 +4,7 @@ from qdrant_client.models import VectorParams, Distance
 
 qdrant_db = QdrantClient(
     url="https://1ed777cc-63bc-4ba7-9895-f838b3551f88.us-east-1-0.aws.cloud.qdrant.io:6333",
-    api_key="H6fT2bbZ0GlAazIk-3nYs-rqqGMNW1s_5DZAvAg87JbS40dNpGEFRg",
+    api_key="",
 )
 
 embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
