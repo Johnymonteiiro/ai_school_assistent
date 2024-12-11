@@ -1,13 +1,15 @@
 
 # create env:
 
-python -m venv api_ai_env
+python -m venv env
 
 # active:
-api_ai_env\Scripts\activate
+env\Scripts\activate
 
 
 # install dependencies
+python.exe -m pip install --upgrade pip
+pip install pandas
 pip install -r requirement.txt
 
 # Run the AP:
@@ -15,3 +17,15 @@ python app.py
 
 # Close env
 deactivate
+
+
+
+1. Quais são os alunos com o maior número de faltas acumuladas nos últimos meses? 
+
+2. Como as médias de notas dos alunos variaram ao longo do semestre, 
+e quais apresentam tendência de queda? 
+
+3. Existem padrões de ocorrências disciplinares 
+que se correlacionam com o desempenho acadêmico dos alunos?
+
+4. "Qual é o percentual de tendência de evasão por semestre e quais estratégias podem ser implementadas para prevenir esse problema?

@@ -4,19 +4,29 @@ from lib.qdrant import embedding_model, qdrant_db
 
 def store(collection_name: str = "alunos", data=[]):
     if len(data) == 0:
-        print("Fail to fetch data: matricula, nome, serie, media, total_aula, total_presenca, total_falta, ocorrencias, turmas")
+        print("Fail to fetch data: matriz de alunos está vazia.")
         return
 
     for _, row in data.iterrows():
         try:
-            ocorrencias = row.get('ocorrencias', [])
+            # Garantir que os valores estejam no formato esperado
+            ocorrencias = row.get("ocorrencias", [])
             if not isinstance(ocorrencias, list):
                 ocorrencias = [ocorrencias]
 
-            turmas = row.get('turmas', [])
+            turmas = row.get("turmas", [])
             if not isinstance(turmas, list):
                 turmas = [turmas]
 
+            disciplinas = row.get("disciplinas", [])
+            if not isinstance(disciplinas, list):
+                disciplinas = [disciplinas]
+
+            notas = row.get("notas", [])
+            if not isinstance(notas, list):
+                notas = [notas]
+
+            # Construir string de dados para o embedding
             content_data = (
                 f"Matricula: {row['matricula']}, "
                 f"Nome: {row['nome']}, "
@@ -26,11 +36,16 @@ def store(collection_name: str = "alunos", data=[]):
                 f"Total de Presenças: {row['total_presenca']}, "
                 f"Total de Faltas: {row['total_falta']}, "
                 f"Ocorrências: {', '.join(map(str, ocorrencias))}, "
-                f"Turmas: {', '.join(map(str, turmas))}"
+                f"Turmas: {', '.join(map(str, turmas))}, "
+                f"Disciplinas: {', '.join(map(str, disciplinas))}, "
+                f"Ano Letivo: {row['ano_letivo']}, "
+                f"Notas: {', '.join(map(str, notas))}, "
+                f"Semestre: {row['semestre']}"
             )
 
             embedding = embedding_model.encode(content_data).tolist()
-            id_value = int(''.join(filter(str.isdigit, row["matricula"])))
+
+            id_value = int(''.join(filter(str.isdigit, str(row["matricula"]))))
 
             qdrant_db.upsert(
                 collection_name=collection_name,
@@ -46,15 +61,21 @@ def store(collection_name: str = "alunos", data=[]):
                         "total_presenca": row["total_presenca"],
                         "total_falta": row["total_falta"],
                         "ocorrencias": ocorrencias,
-                        "turmas": turmas
+                        "turmas": turmas,
+                        "disciplinas": disciplinas,
+                        "ano_letivo": row["ano_letivo"],
+                        "notas": notas,
+                        "semestre": row["semestre"]
                     }
                 }]
             )
+
             print(f"Aluno {row['nome']} indexado com sucesso!")
         except KeyError as e:
             print(f"Erro ao processar linha: Chave ausente {e}")
         except Exception as e:
-            print(f"Erro inesperado ao indexar aluno: {e}")
+            print(f"Erro inesperado ao indexar aluno {
+                  row.get('nome', 'N/A')}: {e}")
 
 
 def search_qdrant(question: str, collection_name: str, limit: int = 5):
